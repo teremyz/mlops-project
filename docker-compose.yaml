@@ -1,0 +1,55 @@
+
+version: '3.5'
+
+networks:
+  prefect:
+    name: prefect
+
+services:
+  prefect-server:
+    image: prefecthq/prefect:2.4.5-python3.8
+    #image: prefecthq/prefect:2.8-python3.7-conda
+    command:
+      - prefect
+      - orion
+      - start
+    ports:
+      - 4200:4200
+    environment:
+      PREFECT_ORION_API_HOST: 0.0.0.0
+      PREFECT_UI_API_URL: http://prefect-server:4200/api
+    networks:
+      - prefect
+
+
+  train_model:
+    image: train_model:v6
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      MLFLOW_TRACKING_SERVER_HOST: http://ec2-3-93-15-183.compute-1.amazonaws.com/
+      MINIO_ROOT_USER: 'user'
+      MINIO_ROOT_PASSWORD: 'password'
+      MINIO_ENDPOINT_URL:  'http://minio:9000'
+    networks:
+      - prefect
+    depends_on:
+      - prefect-server
+      - minio
+
+
+  minio:
+    image: minio/minio
+    environment:
+      - MINIO_ROOT_USER=user
+      - MINIO_ROOT_PASSWORD=password
+    volumes:
+      - ./volumes/minio:/data
+    entrypoint: /bin/bash
+    command: "-c 'mkdir -p /data/prefect-flows && sleep 10 && minio server /data --console-address :9001'"
+    ports:
+      - published: 9000
+        target: 9000
+      - published: 9001
+        target: 9001
+    networks:
+      - prefect
