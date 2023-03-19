@@ -11,16 +11,11 @@ from cornac.eval_methods import BaseMethod
 from cornac.experiment import Experiment
 from cornac.metrics import AUC, NDCG, RMSE, Precision, Recall
 from cornac.models import BPR
+from prefect import flow, get_run_logger, task
 from sklearn.preprocessing import OrdinalEncoder
 
-TRACKING_SERVER_HOST = os.getenv(
-    "TRACKING_SERVER_HOST", "http://ec2-3-83-223-248.compute-1.amazonaws.com"
-)  # fill in with the public DNS of the EC2 instance
-mlflow.set_tracking_uri(f"{TRACKING_SERVER_HOST}:5000")
-print(f"tracking URI: '{mlflow.get_tracking_uri()}'")
-mlflow.set_experiment("shop-recommender")
 
-
+@task
 def preprocess_data(train_df):
     """
     Encode ID columns, convert ids to str and date columns to dates
@@ -31,6 +26,8 @@ def preprocess_data(train_df):
     Returns: Preprocessed data frame
 
     """
+    logger = get_run_logger()
+    logger("Prepricess data...")
     # Ordinal encode ID columns
     product_oe = OrdinalEncoder()
     cetli_oe = OrdinalEncoder()
@@ -44,10 +41,10 @@ def preprocess_data(train_df):
     train_df["user_id"] = user_oe.fit_transform(
         train_df["owner.objectId"].values.reshape(-1, 1)
     )
+    artifact_saving_path = "artifacts/product_cetli_user_ordinal_encoders.pkl"
+    logger("Ordinal encoders are ready. Write them to {artifact_saving_path}")
 
-    with open(
-        "artifacts/product_cetli_user_ordinal_encoders.pkl", "wb"
-    ) as file:
+    with open(artifact_saving_path, "wb") as file:
         pickle.dump((product_oe, cetli_oe, user_oe), file)
 
     # Transform columns to the appropriate date types
@@ -60,6 +57,7 @@ def preprocess_data(train_df):
     return train_df
 
 
+@task
 def create_train_and_test_data(df):
     """
     Crate test and train data. There is one product from
@@ -71,7 +69,8 @@ def create_train_and_test_data(df):
     Returns: Train and test datasets
 
     """
-
+    logger = get_run_logger()
+    logger("Create train and test data...")
     df = df.sort_values(["selected"], ascending=False).drop_duplicates(
         ["cetliId.objectId", "product"], keep="first"
     )
@@ -86,8 +85,8 @@ def create_train_and_test_data(df):
         test_cetli = temp_df.sample(1)
         cetli_train_df.drop(test_cetli.index, inplace=True)
         cetli_test_df.iloc[idx, :] = test_cetli
-    print(f"cetli_train_df shape: {cetli_train_df.shape}")
-    print(f"cetli_test_df shape: {cetli_test_df.shape}")
+    logger(f"cetli_train_df shape: {cetli_train_df.shape}")
+    logger(f"cetli_test_df shape: {cetli_test_df.shape}")
 
     return cetli_train_df, cetli_test_df
 
@@ -128,6 +127,7 @@ def create_rating(df):
     return df
 
 
+@task
 def create_cetli_data(train_df, test_df):
     """
     Creates cetli level test and train set
@@ -138,7 +138,8 @@ def create_cetli_data(train_df, test_df):
     Returns: Test and train triplets to cornac training
 
     """
-
+    logger = get_run_logger()
+    logger("Create rating...")
     train_df = create_rating(train_df)
     user_cetli_number_df = train_df[["user_id", "n_cetli"]].drop_duplicates()
     rating_df = train_df[["user_id", "product_id", "rating"]].drop_duplicates(
@@ -157,8 +158,8 @@ def create_cetli_data(train_df, test_df):
         test_df["rating"].isna(), 1 / test_df["n_cetli"], test_df["rating"]
     )
 
-    print(f"Train shape: {train_df.shape}")
-    print(f"Test shape: {test_df.shape}")
+    logger(f"Train shape: {train_df.shape}")
+    logger(f"Test shape: {test_df.shape}")
 
     cetli_test_triplets = list(
         test_df[["cetli_id", "product_id", "rating"]]
@@ -174,8 +175,10 @@ def create_cetli_data(train_df, test_df):
     return cetli_train_triplets, cetli_test_triplets
 
 
+@task
 def optimize_bpr(trial, eval_method, cetli_train_triplets):
-    print(trial.number)
+    logger = get_run_logger()
+    logger(f"Optimization round: {trial.number}")
 
     params = {
         "k": trial.suggest_int("k", 5, 30),
@@ -225,7 +228,16 @@ def optimize_bpr(trial, eval_method, cetli_train_triplets):
     return rmse
 
 
-def main(train_path="../data/Train.csv", n_trials=2):
+@flow
+def main(train_path="data/Train.csv", n_trials=1):
+    TRACKING_SERVER_HOST = os.getenv(
+        "MLFLOW_TRACKING_SERVER_HOST",
+        "http://ec2-35-171-21-155.compute-1.amazonaws.com",
+    )
+    mlflow.set_tracking_uri(f"{TRACKING_SERVER_HOST}:5000")
+    print(f"MLFLOW tracking URI: '{mlflow.get_tracking_uri()}'")
+    mlflow.set_experiment("shop-recommender")
+
     df = pd.read_csv(train_path)
 
     train_df = preprocess_data(df)
@@ -259,6 +271,3 @@ def main(train_path="../data/Train.csv", n_trials=2):
     hd_study.optimize(
         modeified_optimizer_cetli, n_trials=n_trials, gc_after_trial=True
     )
-
-
-main(train_path="data/Train.csv")
