@@ -2,3 +2,8 @@ data/
 nextent_interview/
 core/
 notebooks/
+volumes/
+models/
+__pycache__/
+artifacts/
+.mypy_cache/
