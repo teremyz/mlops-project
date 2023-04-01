@@ -7,3 +7,4 @@ models/
 __pycache__/
 artifacts/
 .mypy_cache/
+prediction_web_service/web-service-credentials.env
