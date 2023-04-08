@@ -55,10 +55,10 @@ services:
       - prefect
 
   prediction_web_service:
-    image: prediction_web_service:v1
+    image: ${LOCAL_IMAGE_NAME}
     ports:
     - 80:80
     environment:
-      - MLFOW_EXPERIMENT_ID='21545d2284b748c3aa462e3f6c903bcf'
+      - MLFOW_EXPERIMENT_ID=21545d2284b748c3aa462e3f6c903bcf
     env_file:
     - prediction_web_service/web-service-credentials.env
