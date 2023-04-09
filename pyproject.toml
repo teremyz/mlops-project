@@ -21,9 +21,11 @@ max-line-length = 90
 max-complexity = 18
 select = ['B','C','E','F','W','T4','B9']
 
-[mypy]
-plugins = 'pydantic.mypy'
+[tool.mypy]
+python_version = "3.7"
 
+plugins = 'pydantic.mypy'
+exclude = "/home/teremyz/Documents/mlops-project/integration_test/test_web_service.py"
 follow_imports = 'silent'
 strict_optional = true
 warn_redundant_casts = true
