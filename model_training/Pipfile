@@ -17,6 +17,7 @@ s3fs = "*"
 gcsfs = "*"
 adlfs = "*"
 fastapi = "*"
+typing-extensions = "*"
 
 [dev-packages]
 ipykernel = "*"
@@ -25,6 +26,7 @@ flake8 = "*"
 black = "*"
 mypy = "*"
 isort = "*"
+deepdiff = "*"
 
 [requires]
 python_version = "3.7"

@@ -91,7 +91,7 @@ app = FastAPI()
 @app.get("/predict")
 def predict_endpoint(
     cetli_id: str, top_n: int = 5
-) -> Dict[str, Union[float, int, str]]:
+) -> Dict[str, Dict[str, Union[float, str]]]:
     """
     It recommends additional products to an existing receipt (cetli)
 
