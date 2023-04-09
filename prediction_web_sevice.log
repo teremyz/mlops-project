@@ -1,0 +1,3 @@
+INFO:botocore.credentials:Found credentials in shared credentials file: ~/.aws/credentials
+INFO:root:Model downloaded
+INFO:root:Encoders downloaded

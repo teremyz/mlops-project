@@ -15,6 +15,7 @@ uvicorn = "*"
 scikit-learn = "==1.0.2"
 boto3 = "*"
 pytest = "*"
+types-requests = "*"
 
 [dev-packages]
 ipykernel = "*"
