@@ -12,6 +12,8 @@ fi
 
 docker-compose up -d prediction_web_service
 
+echo "docker-compose up finished"
+
 sleep 5
 
 ~/.local/share/virtualenvs/prediction_web_service-TsEAhtVs/bin/python integration_test/test_web_service.py

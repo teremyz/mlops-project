@@ -11,7 +11,7 @@ print("actual response:")
 print(json.dumps(actual_response, indent=4))
 
 expected_response = {
-    "product_id": {"109": 176, "167": 5, "47": 194},
+    "product_id": {"109": 176.0, "167": 5.0, "47": 194.0},
     "product_name": {
         "109": "sajt",
         "167": "avocado",

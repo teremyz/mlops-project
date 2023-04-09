@@ -15,17 +15,18 @@ exclude = '''
 )/
 '''
 
-[flake8]
+[tool.flake8]
 ignore = ['E203', 'E266', 'E501', 'W503', 'F403', 'F401']
 max-line-length = 90
 max-complexity = 18
 select = ['B','C','E','F','W','T4','B9']
 
 [tool.mypy]
+mypy_path="/home/teremyz/.local/share/virtualenvs/mlops-project-z-4QfxLv/lib/python3.7/site-packages"
 python_version = "3.7"
-
+ignore_missing_imports = true
+exclude = ["requests", "yaml"]
 plugins = 'pydantic.mypy'
-exclude = "/home/teremyz/Documents/mlops-project/integration_test/test_web_service.py"
 follow_imports = 'silent'
 strict_optional = true
 warn_redundant_casts = true
@@ -34,10 +35,11 @@ disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
-ignore_missing_imports = true
 
-[pydantic-mypy]
+
+[tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+ignore_missing_imports = true
