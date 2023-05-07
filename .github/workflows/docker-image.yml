@@ -38,7 +38,7 @@ jobs:
       run: pytest tests/
     
     - name: Build the Docker image
-      run: docker build -t 472376749718.dkr.ecr.us-east-1.amazonaws.com/mlops_eco_prediction_web_service:$(shell date +"%Y-%m-%d-%H-%M") prediction_web_service/.
+      run: docker build -t 472376749718.dkr.ecr.us-east-1.amazonaws.com/mlops_eco_prediction_web_service:$(date +"%Y-%m-%d-%H-%M") prediction_web_service/.
     
     - name: Run docker iamge and integration test
       run: bash integration_test/integration_test.sh
