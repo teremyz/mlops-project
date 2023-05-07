@@ -38,7 +38,9 @@ jobs:
       run: pytest tests/
     
     - name: quality cehcks
-      run: make quality_checks
+      run: |
+        black prediction_web_service/.
+        pylint prediction_web_service/.
     
     - name: Build the Docker image
       run: docker build -t 472376749718.dkr.ecr.us-east-1.amazonaws.com/mlops_eco_prediction_web_service:$(shell date +"%Y-%m-%d-%H-%M") prediction_web_service/.
