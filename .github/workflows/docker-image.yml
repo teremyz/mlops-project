@@ -39,6 +39,8 @@ jobs:
     
     - name: quality cehcks
       run: |
+        pip install black==23.3.0
+        pip install pylint==2.4.4
         black prediction_web_service/.
         pylint prediction_web_service/.
     
