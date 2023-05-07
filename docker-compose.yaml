@@ -60,5 +60,7 @@ services:
     - 80:80
     environment:
       - MLFOW_EXPERIMENT_ID=21545d2284b748c3aa462e3f6c903bcf
-    env_file:
-    - prediction_web_service/web-service-credentials.env
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    #env_file:
+    #- prediction_web_service/web-service-credentials.env
