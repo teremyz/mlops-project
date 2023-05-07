@@ -7,7 +7,7 @@ RUN pip install pipenv
 
 RUN mkdir artifacts
 
-COPY ["artifacts/bpr_model.pkl", "artifacts/product_cetli_user_ordinal_encoders.pkl", "/artifacts/"]
+#COPY ["artifacts/bpr_model.pkl", "artifacts/product_cetli_user_ordinal_encoders.pkl", "/artifacts/"]
 
 WORKDIR /app
 
