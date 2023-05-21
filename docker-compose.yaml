@@ -4,6 +4,8 @@ version: '3.5'
 networks:
   prefect:
     name: prefect
+  prediction_network:
+    name: prediction_network
 
 services:
   prefect-server:
@@ -62,5 +64,24 @@ services:
       - MLFOW_EXPERIMENT_ID=21545d2284b748c3aa462e3f6c903bcf
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - EVIDENTLY_SERVICE=http://evidently_service.:8085
+      - MONGODB_ADDRESS=mongodb://mongo.:27017/
     #env_file:
     #- prediction_web_service/web-service-credentials.env
+    #networks:
+    #  - prediction_network
+    depends_on:
+      - mongo
+
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    #volumes:
+    #  - mongo_data:/data/db
+    networks:
+      - prediction_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pwd
