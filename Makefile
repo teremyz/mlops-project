@@ -1,5 +1,5 @@
 LOCAL_TAG:=$(shell date +"%Y-%m-%d-%H-%M")
-LOCAL_IMAGE_NAME:=teremyz21/prediction_web_service:${LOCAL_TAG}
+LOCAL_IMAGE_NAME:=472376749718.dkr.ecr.us-east-1.amazonaws.com/mlops_eco_prediction_web_service:${LOCAL_TAG}
 
 test:
 	pytest tests/
