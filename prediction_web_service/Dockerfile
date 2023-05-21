@@ -7,11 +7,9 @@ RUN pip install pipenv
 
 RUN mkdir artifacts
 
-#COPY ["artifacts/bpr_model.pkl", "artifacts/product_cetli_user_ordinal_encoders.pkl", "/artifacts/"]
-
 WORKDIR /app
 
-COPY ["predict_api.py", "Pipfile", "Pipfile.lock", "./"]
+COPY ["predict_api.py", "utils.py", "Pipfile", "Pipfile.lock", "./"]
 
 RUN pipenv install --system
 

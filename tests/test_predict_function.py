@@ -1,32 +1,24 @@
 import os
-import pickle
-from io import BytesIO
 
-import boto3
 import pandas as pd
 
-import prediction_web_service.predict_api as pp
+import prediction_web_service.utils as pp
 
 MLFOW_EXPERIMENT_ID = os.getenv(
     "MLFOW_EXPERIMENT_ID", "21545d2284b748c3aa462e3f6c903bcf"
 )
 
-s3 = boto3.resource("s3")
-with BytesIO() as data:
-    s3.Bucket("my-mlflow-artifacts-remote").download_fileobj(
-        f"3/{MLFOW_EXPERIMENT_ID}/artifacts/bpr_model.pkl", data
-    )
-    data.seek(0)
-    model = pickle.load(data)
+MODEL = pp.downlod_artifact_from_s3(
+    bucket_name="my-mlflow-artifacts-remote",
+    file_name="bpr_model.pkl",
+    mlflow_exp_id=MLFOW_EXPERIMENT_ID,
+)
 
-with BytesIO() as data:
-    s3.Bucket("my-mlflow-artifacts-remote").download_fileobj(
-        f"3/{MLFOW_EXPERIMENT_ID}/artifacts/"
-        + "product_cetli_user_ordinal_encoders.pkl",
-        data,
-    )
-    data.seek(0)
-    oe_product_id, oe_cetli_id, oe_user_id = pickle.load(data)
+OE_PRODUCT_ID, OE_CETLI_ID, _ = pp.downlod_artifact_from_s3(
+    bucket_name="my-mlflow-artifacts-remote",
+    file_name="product_cetli_user_ordinal_encoders.pkl",
+    mlflow_exp_id=MLFOW_EXPERIMENT_ID,
+)
 
 
 def test_predict_products_using_cetli_id() -> None:
@@ -35,9 +27,9 @@ def test_predict_products_using_cetli_id() -> None:
     actual_prediction = pp.predict_products_using_cetli_id(
         cetli_id=cetli_id,
         top_n=top_n,
-        model=model,
-        oe_product_id=oe_product_id,
-        oe_cetli_id=oe_cetli_id,
+        model=MODEL,
+        oe_product_id=OE_PRODUCT_ID,
+        oe_cetli_id=OE_CETLI_ID,
     )
     expected_prediction: pd.DataFrame = pd.DataFrame(
         {
