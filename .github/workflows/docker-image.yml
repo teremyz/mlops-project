@@ -35,7 +35,9 @@ jobs:
         cd ..
       
     - name: Test application
-      run: pytest tests/
+      run: |
+        pip install -U pytest
+        pytest tests/
     
     - name: Build the Docker image
       run: docker build -t 472376749718.dkr.ecr.us-east-1.amazonaws.com/mlops_eco_prediction_web_service:$(date +"%Y-%m-%d-%H-%M") prediction_web_service/.
