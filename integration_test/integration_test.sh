@@ -10,7 +10,7 @@ else
     echo "no need to build image ${LOCAL_IMAGE_NAME}"
 fi
 
-docker-compose up -d prediction_web_service
+docker-compose up -d mongo prediction_web_service
 
 echo "docker-compose up finished"
 

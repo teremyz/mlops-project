@@ -75,3 +75,19 @@ def predict_products_using_cetli_id(
     ratings = ratings.sort_values("score", ascending=False)
 
     return ratings[["product_id", "product_name", "score"]].head(top_n)
+
+
+# pylint: disable=W0621
+def save_to_mongo_db(record, prediction, collection):
+    """
+    It saves the requests and predictions
+
+    record: dictionary contains the request
+    prediction: model prediction
+    collection: mongo db collection object
+
+    Return: None
+    """
+    rec = record.copy()
+    rec["prediction"] = prediction
+    collection.insert_one(rec)
